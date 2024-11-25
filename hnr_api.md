@@ -6,7 +6,7 @@
 ## 请求信息
 - 请求方法: POST
 - 请求URL: `https://tjupt.org/api/v1/hnr.php`
-- 需要认证: 是 (需要在请求头中携带 API Token)
+- 需要认证: 是 (需要在请求头中携带 API Token，在 [PT控制面板](https://tjupt.org/usercp.php?action=user_api_token) 获取API Token)
 
 ### 请求头 Headers
 ```
