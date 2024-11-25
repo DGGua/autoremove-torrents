@@ -13,6 +13,20 @@
 pip install autoremove-torrents-hnr
 ```
 
+## 更新
+
+```bash
+pip install autoremove-torrents-hnr --upgrade
+或者
+pip install autoremove-torrents-hnr==具体版本号
+```
+
+## 卸载
+
+```bash
+pip uninstall autoremove-torrents-hnr
+```
+
 ## 配置示例
 
 ```yaml
@@ -27,7 +41,7 @@ my_task:
       categories: 
         - TJUPT
       hnr:
-        host: https://pt.example.org/api/v1/hnr.php
+        host: https://tjupt.org/api/v1/hnr.php
         api_token: your_api_token
         require_complete: true  # true表示只删除已达标的种子
 ```
