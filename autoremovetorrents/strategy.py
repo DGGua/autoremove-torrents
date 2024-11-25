@@ -28,6 +28,8 @@ from .exception.unsupportedproperty import UnsupportedProperty
 from .filter.category import CategoryFilter
 from .filter.status import StatusFilter
 from .filter.tracker import TrackerFilter
+from .client.hnr_api import HnrClient
+from .condition.hnr import HnrCondition
 
 class Strategy(object):
     def __init__(self, name, conf):
@@ -131,36 +133,68 @@ class Strategy(object):
             'downloading_time': DownloadingTimeCondition,
             'max_size': SizeCondition,
             'upload_ratio': UploadRatioCondition,
+            'hnr': HnrCondition,
         }
+
         for conf in self._conf:
             if conf in conditions:
                 # Print debug log
                 self._logger.debug('Applying condition %s...' % conditions[conf].__name__)
                 self._logger.debug('INPUT: %d torrent(s) to be reserved before applying the condition.' % len(self.remain_list))
-                for torrent in self.remain_list:
-                    self._logger.debug(torrent)
 
                 # Applying condition processor
                 try:
-                    cond = conditions[conf](self._conf[conf])
-                    cond.apply(client_status, self.remain_list)
-                except AttributeError as e:
-                    raise UnsupportedProperty(
-                        "%s. Your client may not support this property, so the condition %s does not work." % \
-                        (str(e), conf)
-                    )
-                
-                # Output
-                self.remain_list = cond.remain
-                self.remove_list.update(cond.remove)
-
-                # Print updated list to debug log
-                self._logger.debug('OUTPUT: %d torrent(s) to be reserved after applying the condition.' % len(self.remain_list))
-                for torrent in self.remain_list:
-                    self._logger.debug(torrent)
-                self._logger.debug('OUTPUT: %d torrent(s) to be removed after applying the condition.' % len(self.remove_list))
-                for torrent in self.remove_list:
-                    self._logger.debug(torrent)
+                    # 特殊处理 hnr 条件
+                    if conf == 'hnr':
+                        self._logger.debug('Initializing HNR condition...')
+                        hnr_conf = self._conf[conf]
+                        self._logger.debug(f'HNR config: {hnr_conf}')
+                        
+                        # 获取种子的hash列表用于日志
+                        info_hashes = [torrent.hash for torrent in self.remain_list]
+                        self._logger.debug(f'Torrents to check HNR status: {info_hashes}')
+                        
+                        # 初始化日志记录器
+                        hnr_logger = logger.Logger.register('autoremovetorrents.client.hnr')
+                        
+                        client = HnrClient(
+                            host=hnr_conf['host'],
+                            api_token=hnr_conf['api_token'],
+                            logger=hnr_logger  # 传递日志记录器
+                        )
+                        
+                        cond = HnrCondition(
+                            client=client,
+                            require_complete=hnr_conf.get('require_complete', True),
+                            logger=hnr_logger  # 传递日志记录器
+                        )
+                        
+                        self._logger.debug('HNR condition initialized')
+                        
+                        # 直接调用apply并记录结果
+                        cond.apply(client_status, self.remain_list)
+                        self._logger.debug(f'HNR check completed. Remain: {len(cond.remain)}, Remove: {len(cond.remove)}')
+                        
+                    else:
+                        # 其他条件的常规处理
+                        cond = conditions[conf](self._conf[conf])
+                        cond.apply(client_status, self.remain_list)
+                    
+                    # Output
+                    self.remain_list = cond.remain
+                    self.remove_list.update(cond.remove)
+                    
+                    # Print updated list to debug log
+                    self._logger.debug('OUTPUT: %d torrent(s) to be reserved after applying the condition.' % len(self.remain_list))
+                    for torrent in self.remain_list:
+                        self._logger.debug(torrent)
+                    self._logger.debug('OUTPUT: %d torrent(s) to be removed after applying the condition.' % len(self.remove_list))
+                    for torrent in self.remove_list:
+                        self._logger.debug(torrent)
+                        
+                except Exception as e:
+                    self._logger.error(f'Error applying condition {conf}: {str(e)}')
+                    raise
 
     # Execute this strategy
     def execute(self, client_status, torrents):

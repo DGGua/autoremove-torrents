@@ -22,6 +22,8 @@ from .condition.uploadspeed import UploadSpeedCondition
 from .conditionlexer import ConditionLexer
 from .exception.nosuchcondition import NoSuchCondition
 from .exception.syntaxerror import ConditionSyntaxError
+from .client.hnr_api import HnrClient
+from .condition.hnr import HnrCondition
 
 class ConditionParser(object):
     # Condition Map (as constant)
@@ -44,6 +46,7 @@ class ConditionParser(object):
         'upload': UploadsCondition,
         'upload_ratio': UploadRatioCondition,
         'upload_speed': UploadSpeedCondition,
+        'hnr': HnrCondition,
     }
 
     # Condition expression
@@ -129,4 +132,38 @@ class ConditionParser(object):
     def apply(self, client_status, torrents):
         self._torrent_list = set(torrents)
         self._client_status = client_status
+        
+        # 如果是 hnr 条件
+        if hasattr(self, '_hnr_condition'):
+            self._logger.debug("应用HNR条件...")
+            self._hnr_condition.apply(client_status, torrents)
+            self.remain = self._hnr_condition.remain
+            self.remove = self._hnr_condition.remove
+            return
+            
+        # 其他条件的处理
         self.parser.parse(self._expression)
+        
+    def parse_condition(self, conf):
+        """解析配置"""
+        if 'hnr' in conf:
+            self._logger.debug("发现HNR配置，初始化HNR条件")
+            hnr_conf = conf['hnr']
+            
+            self._logger.debug(f"HNR API配置: host={hnr_conf['host']}")
+            client = HnrClient(
+                host=hnr_conf['host'],
+                api_token=hnr_conf['api_token']
+            )
+            
+            require_complete = hnr_conf.get('require_complete', True)
+            self._logger.debug(f"HNR条件配置: require_complete={require_complete}")
+            
+            self._hnr_condition = HnrCondition(
+                client=client,
+                require_complete=require_complete
+            )
+            self._logger.debug("HNR条件初始化完成")
+            return self._hnr_condition
+            
+        return None
