@@ -29,8 +29,19 @@ class HnrCondition(Condition):
             self.remain = set()
             self.remove = set()
             
+            # 只处理在API响应中存在的种子
             for torrent in torrents:
-                is_complete = hnr_status.get(torrent.hash, False)
+                if torrent.hash not in hnr_status:
+                    self._logger.debug(
+                        "种子 %s (%s) - 未在API响应中找到，跳过检查" % (
+                            torrent.name,
+                            torrent.hash
+                        )
+                    )
+                    self.remain.add(torrent)
+                    continue
+                    
+                is_complete = hnr_status[torrent.hash]
                 should_remove = is_complete == self._require_complete
                 self._logger.debug(
                     "种子 %s (%s) - HNR状态: %s, 是否删除: %s" % (
@@ -45,7 +56,7 @@ class HnrCondition(Condition):
                 else:
                     self.remain.add(torrent)
                     
-            self._logger.debug("处理完成 - 保留: %d个, 删除: %d个" % (len(self.remain), len(self.remove)))
+            self._logger.info("处理完成 - 保留: %d个, 删除: %d个" % (len(self.remain), len(self.remove)))
             
         except Exception as e:
             self._logger.error("HNR检查过程中发生错误: %s" % str(e))
