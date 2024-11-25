@@ -25,10 +25,13 @@ class Logger(object):
         Logger.log_path = log_path
 
         # Initialize the file handler
-        Logger.file_handler = logging.FileHandler(os.path.join(
-            Logger.log_path, 
-            Logger.LOG_FILE_NAME % datetime.now().strftime('%Y-%m-%d')
-        ))
+        Logger.file_handler = logging.FileHandler(
+            os.path.join(
+                Logger.log_path, 
+                Logger.LOG_FILE_NAME % datetime.now().strftime('%Y-%m-%d')
+            ),
+            encoding='utf-8'
+        )
         Logger.file_handler.setLevel(logging.DEBUG if file_debug_log else logging.INFO)
         file_handler_formatter = logging.Formatter(Logger.FILE_FORMAT, datefmt=Logger.DATE_FORMAT)
         Logger.file_handler.setFormatter(file_handler_formatter)
