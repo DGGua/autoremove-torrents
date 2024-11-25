@@ -6,11 +6,11 @@ from autoremovetorrents.compatibility.disk_usage_ import SUPPORT_SHUTIL
 from autoremovetorrents.compatibility.open_ import open_
 from autoremovetorrents.compatibility.pyyaml_version_ import PYYAML_VERSION
 
-setup(name = 'autoremove-torrents',
+setup(name = 'autoremove-torrents-hnr',
     version = __version__,
-    description = 'Automatically remove torrents according to your strategies.',
-    long_description = open_('README.rst', 'r', encoding='utf-8').read(),
-    long_description_content_type = 'text/x-rst',
+    description = 'Automatically remove torrents according to your strategies with H&R check support.',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     classifiers = [
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
@@ -18,9 +18,9 @@ setup(name = 'autoremove-torrents',
         'Topic :: Utilities'
     ], # Get classifiers from https://pypi.org/pypi?%3Aaction=list_classifiers
     keywords = 'python autoremove torrent',
-    author = 'jerrymakesjelly',
-    author_email = 'ganzhaoyu037@gmail.com',
-    url = 'https://github.com/jerrymakesjelly/autoremove-torrents',
+    author = 'TJUPT',
+    author_email = 'ptmaster@tjupt.org',
+    url = 'https://github.com/tjupt/autoremove-torrents',
     license = 'MIT',
     packages = find_packages(),
     include_package_data = True,
