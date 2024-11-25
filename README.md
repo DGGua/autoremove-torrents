@@ -44,6 +44,7 @@ my_task:
         host: https://tjupt.org/api/v1/hnr.php
         api_token: your_api_token
         require_complete: true  # true表示只删除已达标的种子
+  delete_data: true  # 是否在删除种子的同时也删除数据。如果此字段未指定，则默认值为 false
 ```
 
 其他条件配置请参考原项目 [autoremove-torrents](https://github.com/jerrymakesjelly/autoremove-torrents) 的文档。

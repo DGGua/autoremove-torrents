@@ -48,7 +48,7 @@ def pre_processor(argv):
     # Run autoremove
     try:
         # Show version
-        lg.info('Auto Remove Torrents %s' % __version__)
+        lg.info('Auto Remove Torrents-hnr %s' % __version__)
         # Load configurations
         lg.info('Loading configurations...')
         with open_(conf_path, 'r', encoding='utf-8') as stream:
