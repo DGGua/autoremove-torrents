@@ -36,11 +36,11 @@ my_task:
 
 ## hnr 配置说明
 
-API 接口文档：[hnr_api.md](https://github.com/tjupt/autoremove-torrents/blob/master/hnr_api.md)
+H&R API 接口文档：[hnr_api.md](https://github.com/tjupt/autoremove-torrents/blob/master/hnr_api.md)
 
 在策略配置中添加 `hnr` 部分：
 
-- `host`: hnr API 地址
+- `host`: H&R API 地址
 - `api_token`: API 访问令牌
 - `require_complete`: 
   - `true`: 只删除 H&R 已达标的种子
@@ -61,6 +61,41 @@ autoremove-torrents --conf=config.yml
 ```bash
 autoremove-torrents --conf=config.yml --log=logs/autoremove.log
 ```
+
+## 项目结构
+### 1 客户端模块 (client/)
+- hnr_api.py: H&R API 客户端，用于查询种子的 H&R 状态
+- 其他客户端适配器（如 qBittorrent, Transmission 等）
+### 2 条件模块 (condition/)
+- base.py: 条件基类，定义了条件的基本接口
+- hnr.py: H&R 条件检查实现
+- 其他条件实现（如分享率、做种时间等）
+### 3 核心功能文件
+- strategy.py: 策略执行器，负责：
+- 应用各种条件
+- 管理种子的保留和删除列表
+- 执行删除操作
+
+- conditionparser.py: 条件解析器，负责：
+- 解析配置文件中的条件
+- 创建对应的条件实例
+- 处理条件组合
+
+## 工作流程
+### 1 配置加载
+- 读取 config.yml
+- 解析任务和策略配置
+### 2 客户端连接
+- 根据配置创建对应的客户端实例
+- 建立连接并验证
+### 3 策略执行
+- 获取种子列表
+- 应用分类过滤
+- 执行条件检查
+- 确定删除列表
+### 4 删除操作
+- 执行种子删除
+- 记录操作日志
 
 ## 许可证
 
