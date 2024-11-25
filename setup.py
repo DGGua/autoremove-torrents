@@ -1,15 +1,21 @@
 #-*- coding:UTF-8 -*-
 
 from setuptools import setup, find_packages
+import os
 from autoremovetorrents.version import __version__
 from autoremovetorrents.compatibility.disk_usage_ import SUPPORT_SHUTIL
 from autoremovetorrents.compatibility.open_ import open_
 from autoremovetorrents.compatibility.pyyaml_version_ import PYYAML_VERSION
 
+# 获取当前目录下的 README.md
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'README.md'), 'r', encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(name = 'autoremove-torrents-hnr',
     version = __version__,
     description = 'Automatically remove torrents according to your strategies with H&R check support.',
-    long_description=open('README.md').read(),
+    long_description = long_description,
     long_description_content_type='text/markdown',
     classifiers = [
         'Environment :: Console',
