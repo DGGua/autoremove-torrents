@@ -26,6 +26,7 @@ class Torrent(object):
                 return '(Not Provided)'
 
         return ("%s\n" +
+            "\tInfo_hash: %s\n" +
             "\tProgress:%.2f%%\tSize:%s\tRatio:%.3f\tTotal Uploaded:%s\n" +
             "\tSeeder(connected/total):%d/%d\tLeecher(connected/total):%d/%d\tStatus:%s\n" +
             "\tDownload Speed:%s(Avg.:%s)\tUpload Speed:%s(Avg.:%s)\n" +
@@ -33,6 +34,7 @@ class Torrent(object):
             "\tCategory:%s\tTracker:%s") % \
             (
                 disp('name'),
+                disp('hash'),
                 disp('progress', lambda x: x*100),
                 disp('size', convert_bytes),
                 disp('ratio'),
