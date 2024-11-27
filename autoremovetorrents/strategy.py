@@ -163,9 +163,10 @@ class Strategy(object):
                             logger=hnr_logger  # 传递日志记录器
                         )
                         
+                        # 使用新的配置字典方式初始化 HnrCondition
                         cond = HnrCondition(
                             client=client,
-                            require_complete=hnr_conf.get('require_complete', True),
+                            config=hnr_conf,
                             logger=hnr_logger  # 传递日志记录器
                         )
                         

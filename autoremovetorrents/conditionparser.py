@@ -156,12 +156,11 @@ class ConditionParser(object):
                 api_token=hnr_conf['api_token']
             )
             
-            require_complete = hnr_conf.get('require_complete', True)
-            self._logger.debug(f"HNR条件配置: require_complete={require_complete}")
+            self._logger.debug(f"HNR配置: {hnr_conf}")
             
             self._hnr_condition = HnrCondition(
                 client=client,
-                require_complete=require_complete
+                config=hnr_conf
             )
             self._logger.debug("HNR条件初始化完成")
             return self._hnr_condition
