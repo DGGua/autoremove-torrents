@@ -184,7 +184,7 @@ class HnrCondition(Condition):
         self._logger.debug("开始检查%d个种子的HNR状态" % len(info_hashes))
         
         try:
-            self._logger.debug("正在请求HNR API...")
+            self._logger.debug("正在获取种子信息...")
             api_results = self._client.check_torrents(info_hashes)
             
             self.remain = set()
