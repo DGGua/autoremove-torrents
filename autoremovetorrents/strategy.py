@@ -167,6 +167,7 @@ class Strategy(object):
                         cond = HnrCondition(
                             client=client,
                             config=hnr_conf,
+                            strategy_name=self._name,  # 传递策略名称
                             logger=hnr_logger  # 传递日志记录器
                         )
                         
