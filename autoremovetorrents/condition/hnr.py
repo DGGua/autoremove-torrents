@@ -25,26 +25,8 @@ class CheckCondition(ABC):
 
 class HnrStatusCondition(CheckCondition):
     """HNR 状态检查"""
-    # HNR 状态码说明
-    HNR_STATUS_DESCRIPTIONS = {
-        0: "未触发",
-        1: "24h等待期",
-        5: "下载考核中",
-        6: "下载考核中(过半)",
-        10: "做种考核中",
-        11: "做种考核中(过半)",
-        12: "未达标",
-        20: "已达标",
-        21: "后达标",
-        40: "种子被删取消",
-        41: "未成功下载取消",
-        42: "管理员取消",
-        43: "自行放弃",
-        44: "冗余考核"
-    }
-    
     def check(self, torrent, hnr_info):
-        target_codes = self._config.get('status_code')
+        target_codes = self._config.get('target_codes')
         if target_codes is None:
             return None, "未配置目标状态码，跳过检查"
             
@@ -52,13 +34,13 @@ class HnrStatusCondition(CheckCondition):
         if not isinstance(target_codes, list):
             target_codes = [target_codes]
             
-        status_code = hnr_info['status_code']
-        status_desc = self.HNR_STATUS_DESCRIPTIONS.get(status_code, "未知状态")
-        should_remove = status_code in target_codes
+        hnr_status_code = hnr_info['hnr_status_code']
+        hnr_status = hnr_info['hnr_status']
+        should_remove = hnr_status_code in target_codes
         
         log_msg = "当前状态码: %d (%s), 目标状态码: %s, 是否匹配: %s" % (
-            status_code,
-            status_desc,
+            hnr_status_code,
+            hnr_status,
             target_codes,
             "是" if should_remove else "否"
         )
@@ -203,7 +185,7 @@ class HnrCondition(Condition):
         
         try:
             self._logger.debug("正在请求HNR API...")
-            hnr_status = self._client.check_torrents(info_hashes)
+            api_results = self._client.check_torrents(info_hashes)
             
             self.remain = set()
             self.remove = set()
@@ -213,15 +195,15 @@ class HnrCondition(Condition):
                 self._logger.debug("========================================")
                 self._logger.debug("处理种子: %s (%s)" % (torrent.name, torrent.hash))
                 
-                if torrent.hash not in hnr_status:
+                if torrent.hash not in api_results:
                     self._logger.debug("种子未在API响应中找到，跳过检查")
                     self.remain.add(torrent)
                     continue
                 
-                hnr_info = hnr_status[torrent.hash]
-                status_code = hnr_info['status_code']
-                status_desc = HnrStatusCondition.HNR_STATUS_DESCRIPTIONS.get(status_code, "未知状态")
-                self._logger.debug("HNR状态码: %d (%s)" % (status_code, status_desc))
+                hnr_info = api_results[torrent.hash]
+                hnr_status_code = hnr_info['hnr_status_code']
+                hnr_status = hnr_info['hnr_status']
+                self._logger.debug("HNR状态码: %d (%s)" % (hnr_status_code, hnr_status))
                 
                 # 检查所有条件
                 should_remove = True

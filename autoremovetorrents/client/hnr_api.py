@@ -50,11 +50,13 @@ class HnrClient:
                 
                 for record in data.get('data', []):
                     info_hash = record['torrent']['info_hash']
-                    status_code = record['status']['hnr_status_code']
+                    hnr_status_code = record['status']['hnr_status_code']
+                    hnr_status = record['status']['hnr_status']
                     result[info_hash] = {
-                        'status_code': status_code
+                        'hnr_status_code': hnr_status_code,
+                        'hnr_status': hnr_status
                     }
-                    self._logger.debug("种子 %s HNR状态码: %d" % (info_hash, status_code))
+                    self._logger.debug("种子 %s HNR状态码: %d (%s)" % (info_hash, hnr_status_code, hnr_status))
                     
             return result
             
