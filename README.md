@@ -4,8 +4,14 @@
 
 ## 新增功能
 
-- 支持通过 API 检查种子的 H&R 状态
-- 可以根据 H&R 达标情况决定是否删除种子
+v2.0.0
+- 整体重构，可以根据 H&R 状态码灵活配置删除条件
+- 支持多个策略组合使用
+- 支持检查种子的做种时间、上传速度等条件
+- 增加种子状态本地缓存，减少 API 请求次数
+
+v1.6.1
+- 支持通过 API 检查种子的 H&R 状态来删除种子
 
 ## 安装
 
@@ -37,17 +43,42 @@ my_task:
   password: password
   
   strategies:
-    remove_completed_hnr:
-      categories: 
+    # 删除未触发考核的种子
+    remove_untriggered_hnr:
+      categories:  # 种子分类（可选）
         - TJUPT
       hnr:
         host: https://tjupt.org/api/v1/hnr.php
         api_token: your_api_token
-        require_complete: true  # true表示只删除已达标的种子
-  delete_data: true  # 是否在删除种子的同时也删除数据。如果此字段未指定，则默认值为 false
+        target_codes: 0  # 未触发考核的种子
+        min_seed_time: 86400  # 做种时间大于1天将被删除
+        min_upload_speed: 51200  # 上传速度小于50KB/s将被删除
+
+    # 删除已通过考核的种子
+    remove_completed_hnr:
+      categories:
+        - TJUPT
+      hnr:
+        host: https://tjupt.org/api/v1/hnr.php
+        api_token: your_api_token
+        target_codes: [20, 21]  # 已通过考核的种子
+        last_activity: 172800  # 2天没有活动的种子将被删除
+        min_upload_speed: 10240  # 上传速度小于10KB/s将被删除
+        min_ratio: 1.0  # 分享率大于1.0将被删除
+
+    # 删除考核被取消的种子
+    remove_cancelled_hnr:
+      categories:
+        - TJUPT
+      hnr:
+        host: https://tjupt.org/api/v1/hnr.php
+        api_token: your_api_token
+        target_codes: [40, 41, 42]  # 考核被取消的种子
+
+  delete_data: true  # 是否在删除种子的同时也删除数据
 ```
 
-其他条件配置请参考原项目 [autoremove-torrents](https://github.com/jerrymakesjelly/autoremove-torrents) 的文档。
+其他条件配置请参考原项目 [autoremove-torrents](https://autoremove-torrents.readthedocs.io/zh-cn/latest/) 的文档。
 
 ## hnr 配置说明
 
@@ -55,11 +86,22 @@ H&R API 接口文档：[hnr_api.md](https://github.com/tjupt/autoremove-torrents
 
 在策略配置中添加 `hnr` 部分：
 
+### 必需参数
 - `host`: H&R API 地址
 - `api_token`: API 访问令牌
-- `require_complete`: 
-  - `true`: 只删除 H&R 已达标的种子
-  - `false`: 只删除 H&R 未达标的种子
+- `target_codes`: 目标状态码，可以是单个状态码或状态码列表，具体见H&R API 接口文档：[hnr_api.md](https://github.com/tjupt/autoremove-torrents/blob/master/hnr_api.md)
+
+### 可选参数
+- `last_activity`: 种子不活跃时间限制，单位为秒
+- `min_seed_time`: 最小做种时间，单位为秒
+- `min_upload_speed`: 最小上传速度，单位为字节/秒
+- `min_ratio`: 最小分享率
+
+### 条件组合说明
+1. 首先检查种子的 HNR 状态码是否匹配 `target_codes`
+2. 如果状态码匹配，则继续检查其他配置的条件（如 `last_activity`、`min_seed_time` 等）
+3. 只有当所有配置的条件都满足时，种子才会被删除
+4. 未配置的条件会被跳过，不参与判断
 
 ## 使用方法
 
