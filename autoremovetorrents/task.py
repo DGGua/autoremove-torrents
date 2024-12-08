@@ -132,6 +132,8 @@ class Task(object):
                 else 'The torrent %s cannot be removed. Reason: %s',
                 delete_list[torrent['hash']], torrent['reason']
             )
+        # 输出统计结果
+        self._logger.info('删除完成 - 成功: %d个, 失败: %d个', len(success), len(failed))
 
     # Execute
     def execute(self):

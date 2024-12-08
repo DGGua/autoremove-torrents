@@ -244,7 +244,7 @@ class HnrCondition(Condition):
                 else:
                     self.remain.add(torrent)
                     
-            self._logger.info("处理完成 - %s - 保留: %d个, 删除: %d个" % (
+            self._logger.info("%s - 处理完成 - 保留: %d个, 删除: %d个" % (
                 self._strategy_name,
                 len(self.remain),
                 len(self.remove)
