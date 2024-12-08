@@ -104,7 +104,7 @@ H&R API 接口文档：[hnr_api.md](https://github.com/tjupt/autoremove-torrents
 4. 未配置的条件会被跳过，不参与判断
 
 ## 使用方法
-
+参考原项目 [autoremove-torrents](https://autoremove-torrents.readthedocs.io/zh-cn/latest/inst.html#run) 的运行说明
 ```bash
 # 预览模式（不会真正删除）
 autoremove-torrents --view --conf=config.yml
@@ -116,7 +116,7 @@ autoremove-torrents --conf=config.yml
 ## 日志
 
 ```bash
-autoremove-torrents --conf=config.yml --log=logs/autoremove.log
+autoremove-torrents --conf=config.yml --log=logs/autoremove.log --debug
 ```
 
 ## 项目结构
