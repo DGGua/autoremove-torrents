@@ -1,3 +1,7 @@
+# Work Pipeline Based ART
+
+在原有仓库基础上，将筛选流程更改为 Pipeline，更适合多流程筛选（如在 硬盘空间条件种，只删除部分满足 H&R 的种子）
+
 # Auto Remove Torrents (H&R Version)
 
 这是一个支持 H&R 检查的自动删种程序，基于 [autoremove-torrents](https://github.com/jerrymakesjelly/autoremove-torrents) 修改，在此感谢原作者jerrymakesjelly。

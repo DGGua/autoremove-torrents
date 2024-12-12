@@ -107,11 +107,12 @@ class Task(object):
 
     # Apply strategies
     def _apply_strategies(self):
-        for strategy_name in self._strategies:
-            strategy = Strategy(strategy_name, self._strategies[strategy_name])
-            strategy.execute(self._client_status, self._torrents)
-            self._remove.update(strategy.remove_list)
-
+        for strategy_name, strategy_pipeline in self._strategies.items():
+            for strategy_pipeline_step in strategy_pipeline:
+                strategy = Strategy(strategy_name, strategy_pipeline_step)
+                strategy.execute(self._client_status, self._torrents)
+                self._remove = set(strategy.remove_list)
+            self._torrents = self._remove
     # Remove torrents
     def _remove_torrents(self):
         # Bulid a dict to store torrent hashes and names which to be deleted
