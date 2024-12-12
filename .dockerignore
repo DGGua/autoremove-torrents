@@ -1,0 +1,10 @@
+# Ignore everything by default
+**
+
+# Allow main.py and autoremovetorrents directory
+!main.py
+!requirements.txt
+!autoremovetorrents/
+# Exclude unnecessary files within autoremovetorrents (if any)
+autoremovetorrents/**/*.log
+autoremovetorrents/**/*.tmp
