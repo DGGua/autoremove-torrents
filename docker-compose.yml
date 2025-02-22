@@ -5,6 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./config:/config
     container_name: autoremove_torrents
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
