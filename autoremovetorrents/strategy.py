@@ -180,11 +180,11 @@ class Strategy(object):
                     else:
                         # 其他条件的常规处理
                         cond = conditions[conf](self._conf[conf])
-                        cond.apply(client_status, self.remain_list)
+                        cond.apply(client_status, self.remain_list, self.remove_list)
                     
                     # Output
                     self.remain_list = cond.remain
-                    self.remove_list.update(cond.remove)
+                    self.remove_list = cond.remove
                     
                     # Print updated list to debug log
                     self._logger.debug('OUTPUT: %d torrent(s) to be reserved after applying the condition.' % len(self.remain_list))
